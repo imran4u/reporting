@@ -1,6 +1,8 @@
 package reporting
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/imran4u/reporting/reportstore"
@@ -67,4 +69,14 @@ func (s *ReportManagerSuit) TestCreateReport() {
 	}
 	s.Equal(actualResponse, expectedResponse)
 
+}
+
+func (s *ReportManagerSuit) TestCreateReportError() {
+	s.mockUUIDGenerator.EXPECT().Generate().Return("reportId").Times(1)
+	createError := errors.New("my custom error")
+	s.mockReportStore.EXPECT().CreateReport(gomock.Any()).Return(createError).Times(1)
+
+	_, err := s.manager.CreateReport(CreateReportRequest{})
+	fmt.Println(createError, ": ", err)
+	s.Equal(createError, err)
 }
